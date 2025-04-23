@@ -577,6 +577,7 @@ void SatelliteTrackerWorker::aos(SatWorkerState *satWorkerState)
     // Indicate AOS to GUI
     if (getMessageQueueToGUI())
     {
+        qDebug() << "SatelliteTrackerWorker::aos getMessageQueueToGUI() was true";
         QString speech = substituteVariables(m_settings.m_aosSpeech, satWorkerState->m_name);
         getMessageQueueToGUI()->push(SatelliteTrackerReport::MsgReportAOS::create(satWorkerState->m_name, speech));
     }
@@ -584,15 +585,19 @@ void SatelliteTrackerWorker::aos(SatWorkerState *satWorkerState)
     // Update target
     if (m_settings.m_autoTarget && (satWorkerState->m_name != m_settings.m_target))
     {
+        qDebug() << "SatelliteTrackerWorker::aos (m_settings.m_autoTarget && (satWorkerState->m_name != m_settings.m_target)) was true";
         // Only switch if higher priority (earlier in list) or other target not in AOS
         SatWorkerState *targetSatWorkerState = m_workerState.value(m_settings.m_target);
         int currentTargetIdx = m_settings.m_satellites.indexOf(m_settings.m_target);
         int newTargetIdx = m_settings.m_satellites.indexOf(satWorkerState->m_name);
         if ((newTargetIdx < currentTargetIdx) || !targetSatWorkerState->hasAOS(m_satelliteTracker->currentDateTimeUtc()))
         {
+            qDebug() << "SatelliteTrackerWorker::aos ((newTargetIdx < currentTargetIdx) || !targetSatWorkerState->hasAOS(m_satelliteTracker->currentDateTimeUtc())) was true";
             // Stop doppler correction for current target
-            if (m_workerState.contains(m_settings.m_target))
+            if (m_workerState.contains(m_settings.m_target)) {
+                qDebug() << "SatelliteTrackerWorker::aos (m_workerState.contains(m_settings.m_target)) was true";
                 disableDoppler(m_workerState.value(m_settings.m_target));
+            }
 
             qDebug() << "SatelliteTrackerWorker::aos - autoTarget setting " << satWorkerState->m_name;
             m_settings.m_target = satWorkerState->m_name;
@@ -603,8 +608,12 @@ void SatelliteTrackerWorker::aos(SatWorkerState *satWorkerState)
     }
 
     // TODO: Detect if different device sets are used and support multiple sats simultaneously
-    if (m_settings.m_target == satWorkerState->m_name)
+    if (m_settings.m_target == satWorkerState->m_name) {
+        qDebug() << "SatelliteTrackerWorker::aos (m_settings.m_target == satWorkerState->m_name) was true";
         applyDeviceAOSSettings(satWorkerState->m_name);
+    }
+
+    qDebug() << "SatelliteTrackerWorker::aos EOF " << satWorkerState->m_name;
 }
 
 // Determine if we need to flip rotator or use extended azimuth to avoid 360/0 discontinuity
